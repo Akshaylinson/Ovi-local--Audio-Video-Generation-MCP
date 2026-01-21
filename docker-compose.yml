@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  # Model Download Service
+  ovi-download:
+    build:
+      context: .
+      dockerfile: Dockerfile.download
+    volumes:
+      - ./ckpts:/app/ckpts
+    command: ["python3", "download_weights.py", "--output-dir", "/app/ckpts", "--models", "960x960_10s"]
+    profiles: ["download"]
+
+  # Inference Service
+  ovi-inference:
+    build:
+      context: .
+      dockerfile: Dockerfile.inference
+    volumes:
+      - ./ckpts:/app/ckpts
+      - ./outputs:/app/outputs
+      - ./ovi/configs:/app/ovi/configs
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      - ovi-download
+    profiles: ["inference"]
+
+  # Multi-GPU Inference Service
+  ovi-inference-multi:
+    build:
+      context: .
+      dockerfile: Dockerfile.inference
+    volumes:
+      - ./ckpts:/app/ckpts
+      - ./outputs:/app/outputs
+      - ./ovi/configs:/app/ovi/configs
+    environment:
+      - CUDA_VISIBLE_DEVICES=0,1,2,3
+    command: ["torchrun", "--nnodes", "1", "--nproc_per_node", "4", "inference.py", "--config-file", "ovi/configs/inference/inference_fusion.yaml"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    depends_on:
+      - ovi-download
+    profiles: ["multi-gpu"]
+
+  # Gradio Web Interface
+  ovi-gradio:
+    build:
+      context: .
+      dockerfile: Dockerfile.gradio
+    ports:
+      - "7891:7891"
+    volumes:
+      - ./ckpts:/app/ckpts
+      - ./outputs:/app/outputs
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      - ovi-download
+    profiles: ["gradio"]
+
+  # Low VRAM Gradio (24GB)
+  ovi-gradio-low-vram:
+    build:
+      context: .
+      dockerfile: Dockerfile.gradio
+    ports:
+      - "7891:7891"
+    volumes:
+      - ./ckpts:/app/ckpts
+      - ./outputs:/app/outputs
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    command: ["python3", "gradio_app.py", "--server_name", "0.0.0.0", "--server_port", "7891", "--cpu_offload", "--fp8"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      - ovi-download
+    profiles: ["low-vram"]
+
+volumes:
+  ckpts:
+  outputs:

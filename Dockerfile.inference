@@ -1,0 +1,37 @@
+# Dockerfile for Ovi Inference
+FROM nvidia/cuda:12.1-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 python3-pip git wget curl ffmpeg \
+    libsm6 libxext6 libxrender-dev libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy and install dependencies
+COPY requirements.txt .
+RUN pip3 install torch==2.6.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install -r requirements.txt
+RUN pip3 install flash_attn --no-build-isolation
+
+# Copy application code
+COPY . .
+
+# Create model and output directories
+RUN mkdir -p /app/ckpts /app/outputs
+
+# Download models (optional - can be done at runtime)
+# RUN python3 download_weights.py --models 960x960_10s
+
+# Expose port for potential API usage
+EXPOSE 8000
+
+# Default command for inference
+CMD ["python3", "inference.py", "--config-file", "ovi/configs/inference/inference_fusion.yaml"]

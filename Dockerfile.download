@@ -1,0 +1,23 @@
+# Dockerfile for Model Download Utility
+FROM python:3.10-slim
+
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    wget curl git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install minimal dependencies for downloading
+RUN pip3 install requests tqdm huggingface_hub
+
+# Copy download script
+COPY download_weights.py .
+
+# Create model directory
+RUN mkdir -p /app/ckpts
+
+# Default command
+CMD ["python3", "download_weights.py", "--output-dir", "/app/ckpts"]

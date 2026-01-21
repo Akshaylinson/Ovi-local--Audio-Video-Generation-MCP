@@ -1,0 +1,38 @@
+# Dockerfile for Ovi Gradio Web Interface
+FROM nvidia/cuda:12.1-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 python3-pip git wget curl ffmpeg \
+    libsm6 libxext6 libxrender-dev libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy and install dependencies
+COPY requirements.txt .
+RUN pip3 install torch==2.6.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install -r requirements.txt
+RUN pip3 install flash_attn --no-build-isolation
+
+# Copy application code
+COPY . .
+
+# Create directories
+RUN mkdir -p /app/ckpts /app/outputs
+
+# Expose Gradio port
+EXPOSE 7891
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:7891/ || exit 1
+
+# Default command for Gradio app
+CMD ["python3", "gradio_app.py", "--server_name", "0.0.0.0", "--server_port", "7891", "--cpu_offload"]
