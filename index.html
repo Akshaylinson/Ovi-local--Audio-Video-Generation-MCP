@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ovi AI - Create Videos with Audio from Text & Images</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .pricing-popular {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: .15em solid #667eea;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret .75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #667eea; }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 rounded-lg gradient-bg flex items-center justify-center">
+                        <i class="fas fa-play text-white text-lg"></i>
+                    </div>
+                    <span class="text-2xl font-bold bg-clip-text text-transparent gradient-bg">Ovi AI</span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="font-medium hover:text-purple-600 transition">Features</a>
+                    <a href="#examples" class="font-medium hover:text-purple-600 transition">Examples</a>
+                    <a href="#how-it-works" class="font-medium hover:text-purple-600 transition">How It Works</a>
+                    <a href="#pricing" class="font-medium hover:text-purple-600 transition">Pricing</a>
+                    <a href="#try-now" class="font-medium hover:text-purple-600 transition">Try Now</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/character-ai/Ovi" target="_blank" class="p-2 rounded-lg hover:bg-gray-100">
+                        <i class="fab fa-github text-gray-700"></i>
+                    </a>
+                    <a href="#try-now" class="px-5 py-2 rounded-lg gradient-bg text-white font-medium hover:shadow-lg transition">Get Started</a>
+                    <button id="mobile-menu-btn" class="md:hidden p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 py-4 border-t">
+                <div class="flex flex-col space-y-4">
+                    <a href="#features" class="font-medium hover:text-purple-600 transition">Features</a>
+                    <a href="#examples" class="font-medium hover:text-purple-600 transition">Examples</a>
+                    <a href="#how-it-works" class="font-medium hover:text-purple-600 transition">How It Works</a>
+                    <a href="#pricing" class="font-medium hover:text-purple-600 transition">Pricing</a>
+                    <a href="#try-now" class="font-medium hover:text-purple-600 transition">Try Now</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row items-center">
+                <div class="lg:w-1/2 mb-12 lg:mb-0 animate-fade-in-up">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium mb-6">
+                        <i class="fas fa-bolt mr-2"></i> Now with 10-second video generation
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                        Create <span class="gradient-bg bg-clip-text text-transparent">Videos with Audio</span> from Text & Images
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8">
+                        Ovi AI is a revolutionary platform that generates synchronized video and audio content simultaneously using advanced cross-modal fusion technology.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#try-now" class="px-8 py-4 rounded-xl gradient-bg text-white font-semibold text-lg hover:shadow-xl transition flex items-center justify-center">
+                            <i class="fas fa-play-circle mr-3"></i> Generate Your Video
+                        </a>
+                        <a href="#how-it-works" class="px-8 py-4 rounded-xl bg-white text-purple-700 font-semibold text-lg border-2 border-purple-200 hover:border-purple-400 transition flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-3"></i> Learn More
+                        </a>
+                    </div>
+                    
+                    <div class="mt-10 flex flex-wrap items-center space-x-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span class="font-medium">10-second videos</span>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span class="font-medium">960×960 resolution</span>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span class="font-medium">Text or Image inputs</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 lg:pl-12">
+                    <div class="video-container">
+                        <!-- Demo video placeholder -->
+                        <video poster="https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" controls>
+                            <source src="https://github.com/user-attachments/assets/191f51fb-ef5a-4197-b26f-a5369dc2c007" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <p class="text-center text-gray-500 mt-4"><em>Ovi 1.1 – 10-second temporally consistent video generation (960 × 960 resolution)</em></p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Powerful Features for Creative Generation</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Ovi combines state-of-the-art video and audio generation in a single, powerful platform.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-xl gradient-bg flex items-center justify-center mb-6">
+                        <i class="fas fa-film text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Video+Audio Generation</h3>
+                    <p class="text-gray-600">Generate synchronized video and audio content simultaneously from text or text+image inputs.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-xl gradient-bg flex items-center justify-center mb-6">
+                        <i class="fas fa-music text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">High-Quality Audio</h3>
+                    <p class="text-gray-600">5B audio branch pretrained from scratch using high-quality in-house audio datasets.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-xl gradient-bg flex items-center justify-center mb-6">
+                        <i class="fas fa-clock text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">10-Second Videos</h3>
+                    <p class="text-gray-600">Generate 10-second videos at 24 FPS with 960×960 resolution and various aspect ratios.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-xl gradient-bg flex items-center justify-center mb-6">
+                        <i class="fas fa-image text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Flexible Input</h3>
+                    <p class="text-gray-600">Supports text-only or text+image conditioning for versatile content creation.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-xl gradient-bg flex items-center justify-center mb-6">
+                        <i class="fas fa-tools text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Easy Integration</h3>
+                    <p class="text-gray-600">ComfyUI support available via ComfyUI-WanVideoWrapper. Create videos on wavespeed.ai or HuggingFace.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="feature-card bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                    <div class="w-14 h-14 rounded-xl gradient-bg flex items-center justify-center mb-6">
+                        <i class="fas fa-bolt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Ovi 1.1 Update</h3>
+                    <p class="text-gray-600">Temporal-consistent 10-second video generation at 960×960 resolution with improved training.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Example Videos Section -->
+    <section id="examples" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">See Ovi AI in Action</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Explore examples of videos generated by Ovi AI from simple text prompts.</p>
+            </div>
+            
+            <div class="example-grid">
+                <!-- Example 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg">
+                    <div class="relative pt-[56.25%]">
+                        <video class="absolute top-0 left-0 w-full h-full object-cover" controls>
+                            <source src="https://github.com/user-attachments/assets/c7e75ef8-adf9-4612-a279-56e4cf7ce146" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold mb-2">Ocean Sunset</h4>
+                        <p class="text-gray-600 text-sm">Audio: Gentle waves crashing, seagulls in distance</p>
+                    </div>
+                </div>
+                
+                <!-- Example 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg">
+                    <div class="relative pt-[56.25%]">
+                        <video class="absolute top-0 left-0 w-full h-full object-cover" controls>
+                            <source src="https://github.com/user-attachments/assets/025f5936-883e-4851-bf35-1a809769ba97" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold mb-2">City Nightlife</h4>
+                        <p class="text-gray-600 text-sm">Audio: Traffic sounds, distant music, people talking</p>
+                    </div>
+                </div>
+                
+                <!-- Example 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg">
+                    <div class="relative pt-[56.25%]">
+                        <video class="absolute top-0 left-0 w-full h-full object-cover" controls>
+                            <source src="https://github.com/user-attachments/assets/9e5bf0df-74d6-4e04-a7d0-e5b64616afa9" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold mb-2">Forest Walk</h4>
+                        <p class="text-gray-600 text-sm">Audio: Birds chirping, leaves rustling, gentle stream</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="https://aaxwaz.github.io/Ovi/" target="_blank" class="inline-flex items-center px-6 py-3 rounded-lg gradient-bg text-white font-medium hover:shadow-lg transition">
+                    <i class="fas fa-external-link-alt mr-2"></i> View More Examples
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">How Ovi AI Works</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Three simple steps to create your audio-video content.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <!-- Step 1 -->
+                <div class="md:w-1/3 text-center mb-12 md:mb-0 px-6">
+                    <div class="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6">
+                        <span class="text-white text-2xl font-bold">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Upload or Describe</h3>
+                    <p class="text-gray-600">Provide a text prompt describing your video, or upload an image as a starting point.</p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="md:w-1/3 text-center mb-12 md:mb-0 px-6">
+                    <div class="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6">
+                        <span class="text-white text-2xl font-bold">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Customize Settings</h3>
+                    <p class="text-gray-600">Adjust video length, resolution, aspect ratio, and audio description format.</p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="md:w-1/3 text-center px-6">
+                    <div class="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6">
+                        <span class="text-white text-2xl font-bold">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Generate & Download</h3>
+                    <p class="text-gray-600">Ovi AI generates synchronized video and audio. Download or share your creation.</p>
+                </div>
+            </div>
+            
+            <!-- Prompt Format -->
+            <div class="mt-20 bg-gray-50 rounded-2xl p-8 max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold mb-6 text-center">Prompt Format Guide</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold text-lg mb-3">Speech Tags</h4>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-lg font-mono text-sm">
+                            &lt;S&gt;Your speech content here&lt;E&gt;
+                        </div>
+                        <p class="text-gray-600 mt-2">Text enclosed in these tags will be converted to speech in the generated video.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-3">Audio Description</h4>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-lg font-mono text-sm">
+                            Audio: YOUR AUDIO DESCRIPTION
+                        </div>
+                        <p class="text-gray-600 mt-2">Describes the audio or sound effects present in the video (place at end of prompt).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Try Now Section -->
+    <section id="try-now" class="py-16 gradient-bg text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Generate Your First Video</h2>
+                <p class="text-xl mb-10 opacity-90">Try Ovi AI now with our free tier or explore premium options for more features.</p>
+                
+                <!-- Simple Generator Form -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-10">
+                    <h3 class="text-2xl font-bold mb-6">Quick Video Generator</h3>
+                    
+                    <div class="mb-6">
+                        <label class="block text-left mb-2 font-medium">Enter your video description</label>
+                        <textarea id="prompt-input" class="w-full p-4 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white" rows="4" placeholder="A peaceful mountain landscape at sunrise with mist in the valleys..."></textarea>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-left mb-2 font-medium">Audio description</label>
+                        <input id="audio-input" class="w-full p-4 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white" placeholder="Audio: Gentle wind, birds chirping in the distance" value="Audio: Gentle wind, birds chirping in the distance">
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-8">
+                        <div class="text-left">
+                            <label class="block mb-2 font-medium">Video Length</label>
+                            <select class="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none">
+                                <option>5 seconds</option>
+                                <option selected>10 seconds</option>
+                            </select>
+                        </div>
+                        <div class="text-left">
+                            <label class="block mb-2 font-medium">Resolution</label>
+                            <select class="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none">
+                                <option>720×720</option>
+                                <option selected>960×960</option>
+                            </select>
+                        </div>
+                        <div class="text-left">
+                            <label class="block mb-2 font-medium">Aspect Ratio</label>
+                            <select class="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none">
+                                <option>1:1 (Square)</option>
+                                <option>16:9 (Widescreen)</option>
+                                <option>9:16 (Vertical)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="generate-btn" class="px-10 py-4 bg-white text-purple-700 font-bold text-lg rounded-xl hover:bg-gray-100 transition flex items-center justify-center mx-auto">
+                        <i class="fas fa-play-circle mr-3"></i> Generate Video (Demo)
+                    </button>
+                    
+                    <p class="text-sm opacity-80 mt-4">Note: This is a demo interface. For actual generation, use our platform links below.</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row justify-center space-y-6 md:space-y-0 md:space-x-6">
+                    <a href="https://wavespeed.ai/models/character-ai/ovi/text-to-video" target="_blank" class="px-8 py-4 bg-white text-purple-700 font-bold rounded-xl hover:bg-gray-100 transition">
+                        <i class="fas fa-external-link-alt mr-2"></i> Try on WaveSpeed
+                    </a>
+                    <a href="https://huggingface.co/spaces/akhaliq/Ovi" target="_blank" class="px-8 py-4 bg-white text-purple-700 font-bold rounded-xl hover:bg-gray-100 transition">
+                        <i class="fab fa-huggingface mr-2"></i> Try on HuggingFace
+                    </a>
+                    <a href="https://github.com/character-ai/Ovi" target="_blank" class="px-8 py-4 bg-white/20 border-2 border-white text-white font-bold rounded-xl hover:bg-white/30 transition">
+                        <i class="fab fa-github mr-2"></i> View on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-8 md:mb-0">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 rounded-lg gradient-bg flex items-center justify-center">
+                            <i class="fas fa-play text-white text-lg"></i>
+                        </div>
+                        <span class="text-2xl font-bold">Ovi AI</span>
+                    </div>
+                    <p class="text-gray-400 max-w-md">Twin Backbone Cross-Modal Fusion for Audio-Video Generation</p>
+                </div>
+                
+                <div class="flex space-x-6 mb-8 md:mb-0">
+                    <a href="https://arxiv.org/abs/2510.01284" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-file-alt text-xl"></i>
+                    </a>
+                    <a href="https://github.com/character-ai/Ovi" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://huggingface.co/chetwinlow1/Ovi" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-huggingface text-xl"></i>
+                    </a>
+                    <a href="https://aaxwaz.github.io/Ovi/" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-globe text-xl"></i>
+                    </a>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400 mb-2">Created by Character AI & Yale University</p>
+                    <p class="text-gray-400 text-sm">© 2025 Ovi AI. All rights reserved.</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-10 pt-8 text-center text-gray-500 text-sm">
+                <p>Ovi: Twin Backbone Cross-Modal Fusion for Audio-Video Generation by Chetwin Low, Weimin Wang, and Calder Katyal</p>
+                <p class="mt-2"><a href="https://arxiv.org/abs/2510.01284" class="text-purple-400 hover:text-purple-300">arXiv:2510.01284</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+        });
+        
+        // Generate button demo functionality
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            const prompt = document.getElementById('prompt-input').value;
+            const audio = document.getElementById('audio-input').value;
+            
+            if (!prompt.trim()) {
+                alert('Please enter a video description to generate.');
+                return;
+            }
+            
+            // Show loading state
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> Generating...';
+            btn.disabled = true;
+            
+            // Simulate generation process
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check-circle mr-3"></i> Generation Complete!';
+                btn.classList.remove('bg-white', 'text-purple-700');
+                btn.classList.add('bg-green-500', 'text-white');
+                
+                // Show demo message
+                alert('This is a demo interface. To actually generate videos, please use the WaveSpeed or HuggingFace links provided.');
+                
+                // Reset button after a moment
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('bg-green-500', 'text-white');
+                    btn.classList.add('bg-white', 'text-purple-700');
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+        
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements to animate
+        document.querySelectorAll('.feature-card, .example-grid > div, .pricing-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
