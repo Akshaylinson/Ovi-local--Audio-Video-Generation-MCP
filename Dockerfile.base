@@ -1,1 +1,49 @@
+# Base Dockerfile for Ovi - GPU-enabled inference
+FROM nvidia/cuda:12.1-devel-ubuntu22.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    git \
+    wget \
+    curl \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install PyTorch with CUDA support
+RUN pip3 install torch==2.6.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# Install other dependencies
+RUN pip3 install -r requirements.txt
+
+# Install Flash Attention
+RUN pip3 install flash_attn --no-build-isolation
+
+# Copy application code
+COPY . .
+
+# Create directories for models and outputs
+RUN mkdir -p /app/ckpts /app/outputs
+
+# Set default command
+CMD ["python3", "--help"]
 
